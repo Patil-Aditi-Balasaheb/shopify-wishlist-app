@@ -1,39 +1,63 @@
 <div class="wishlist-inspire__icon" x-data="wishlist">
-
   <button type="button" @click="addToWishlist()">
-    <svg class="wishlist-inspire__icon--svg" viewBox="0 0 24 24" stroke-width="2" stroke="#000" :fill="wishlisted ? '#000': '#fff' ">
+    <svg
+      class="wishlist-inspire__icon--svg"
+      viewBox="0 0 24 24"
+      stroke-width="2"
+      stroke="#000"
+      :fill="wishlisted ? '#000': '#fff' "
+    >
       <path d="M12 21.35l-1.45-1.32C5.4 15.73 2 12.27 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.77-3.4 7.23-8.55 11.53L12 21.35z"/>
     </svg>
     {% if block.settings.text != blank %}
       <span class="wishlist-inspire__icon--text">{{ block.settings.text }}</span>
     {% endif %}
   </button>
-
 </div>
 
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
 <script>
-    document.addEventListener('alpine:init', () => {
-        Alpine.data('wishlist', () => ({
-            wishlisted: false,
+  document.addEventListener('alpine:init', () => {
+      Alpine.data('wishlist', () => ({
+          wishlisted: false,
+          appUrl:'https://operations-risks-inspections-pst.trycloudflare.com/'
+          addToWishlist() {
+              this.wishlisted = !this.wishlisted
+              // TODO: send data to database
+              // if customer is not login, show an alert to login
+              {% unless customer %}
+                alert('Please login to add to wishlist')
+                return
+              {% endunless %}
 
-            addToWishlist() {
-                this.wishlisted = !this.wishlisted
-                // TODO: send data to database
-            }
-        }))
-    })
+              const formdata = new FormData();
+              formdata.append("customerId", "{{ customer.id }}");
+              formdata.append("productId", "{{product.id}}");
+              formdata.append("shop", "{{shop.permanent_domain}}");
+
+              const requestOptions = {
+                method: "POST",
+                body: formdata,
+                redirect: "follow"
+              };
+
+              fetch(this.appUrl+"/api/wishlist", requestOptions)
+                .then((response) => response.text())
+                .then((result) => this.wishlisted = !this.wishlisted)
+                .catch((error) => console.error(error));
+          }
+      }))
+  })
 </script>
 
-
 <style>
-  .wishlist-inspire__icon{
+  .wishlist-inspire__icon {
     display: flex;
     justify-content: center;
     max-width: 44rem;
   }
-  .wishlist-inspire__icon button{
+  .wishlist-inspire__icon button {
     background: none;
     border: none;
     padding: 0;
@@ -43,11 +67,10 @@
     gap: 0.5rem;
     align-items: center;
   }
-  .wishlist-inspire__icon--svg{
+  .wishlist-inspire__icon--svg {
     width: 2rem;
     height: 2rem;
   }
-
 </style>
 {% schema %}
 {

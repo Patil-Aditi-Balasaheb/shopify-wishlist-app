@@ -3,7 +3,7 @@
 client_id = "e9ff027fc3cb8d600204ed5b50434880"
 name = "wishlist-test-app"
 handle = "wishlist-test-app-4"
-application_url = "https://sox-aged-stone-equilibrium.trycloudflare.com"
+application_url = "https://operations-risks-inspections-pst.trycloudflare.com"
 embedded = true
 
 [build]
@@ -17,9 +17,9 @@ scopes = "write_products"
 
 [auth]
 redirect_urls = [
-  "https://sox-aged-stone-equilibrium.trycloudflare.com/auth/callback",
-  "https://sox-aged-stone-equilibrium.trycloudflare.com/auth/shopify/callback",
-  "https://sox-aged-stone-equilibrium.trycloudflare.com/api/auth/callback"
+  "https://operations-risks-inspections-pst.trycloudflare.com/auth/callback",
+  "https://operations-risks-inspections-pst.trycloudflare.com/auth/shopify/callback",
+  "https://operations-risks-inspections-pst.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]
