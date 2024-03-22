@@ -3,7 +3,7 @@
 client_id = "e9ff027fc3cb8d600204ed5b50434880"
 name = "wishlist-test-app"
 handle = "wishlist-test-app-4"
-application_url = "https://essence-privilege-reproduce-experiencing.trycloudflare.com"
+application_url = "https://catalogs-afford-chart-quilt.trycloudflare.com"
 embedded = true
 
 [build]
@@ -17,9 +17,9 @@ scopes = "write_products"
 
 [auth]
 redirect_urls = [
-  "https://essence-privilege-reproduce-experiencing.trycloudflare.com/auth/callback",
-  "https://essence-privilege-reproduce-experiencing.trycloudflare.com/auth/shopify/callback",
-  "https://essence-privilege-reproduce-experiencing.trycloudflare.com/api/auth/callback"
+  "https://catalogs-afford-chart-quilt.trycloudflare.com/auth/callback",
+  "https://catalogs-afford-chart-quilt.trycloudflare.com/auth/shopify/callback",
+  "https://catalogs-afford-chart-quilt.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]
