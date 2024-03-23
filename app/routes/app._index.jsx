@@ -6,169 +6,95 @@ import {
   Layout,
   Text,
   Card,
-  Button,
   BlockStack,
-  Box,
   List,
   Link,
   InlineStack,
+  EmptyState,
+  IndexTable,
 } from "@shopify/polaris";
 import { authenticate } from "../shopify.server";
+import db from "../db.server"
+import { useLoaderData } from "@remix-run/react";
 
 export const loader = async ({ request }) => {
-  await authenticate.admin(request);
+  const auth = await authenticate.admin(request);
+  const shop = auth.session.shop;
+  const wishlistData = await db.wishlist.findMany({
+    where: {
+      shop: shop,
+    }, orderBy: {
+      id: 'asc'
+    }
+  })
+  console.log(wishlistData)
 
-  return null;
+  return json(wishlistData);
 };
 
 export const action = async ({ request }) => {
-  const { admin } = await authenticate.admin(request);
-  const color = ["Red", "Orange", "Yellow", "Green"][
-    Math.floor(Math.random() * 4)
-  ];
-  const response = await admin.graphql(
-    `#graphql
-      mutation populateProduct($input: ProductInput!) {
-        productCreate(input: $input) {
-          product {
-            id
-            title
-            handle
-            status
-            variants(first: 10) {
-              edges {
-                node {
-                  id
-                  price
-                  barcode
-                  createdAt
-                }
-              }
-            }
-          }
-        }
-      }`,
-    {
-      variables: {
-        input: {
-          title: `${color} Snowboard`,
-          variants: [{ price: Math.random() * 100 }],
-        },
-      },
-    },
-  );
-  const responseJson = await response.json();
 
-  return json({
-    product: responseJson.data?.productCreate?.product,
-  });
 };
 
 export default function Index() {
-  const nav = useNavigation();
-  const actionData = useActionData();
-  const submit = useSubmit();
-  const isLoading =
-    ["loading", "submitting"].includes(nav.state) && nav.formMethod === "POST";
-  const productId = actionData?.product?.id.replace(
-    "gid://shopify/Product/",
-    "",
-  );
+  const wishlistData = useLoaderData()
 
-  useEffect(() => {
-    if (productId) {
-      shopify.toast.show("Product created");
-    }
-  }, [productId]);
-  const generateProduct = () => submit({}, { replace: true, method: "POST" });
+  const rowMarkup = wishlistData.map(({ id, customerId, productId, createdAt }, index) => (
+    <IndexTable.Row id={id} key={id} position={index}>
+      <IndexTable.Cell>
+        <Text variant="bodyMd" fontWeight="bold" as="span">
+          {customerId}
+        </Text>
+      </IndexTable.Cell>
+      <IndexTable.Cell>{productId}</IndexTable.Cell>
+      <IndexTable.Cell>{new Date(createdAt).toLocaleDateString()}</IndexTable.Cell>
+    </IndexTable.Row>
+  ))
+
+  const resourceName = {
+    singular: 'wishlist',
+    plural: 'wishlists'
+  }
 
   return (
     <Page>
-      <ui-title-bar title="Overview">
-        {/* <button variant="primary" onClick={generateProduct}>
-          Generate a product
-        </button> */}
+      <ui-title-bar title="Wishlist Overview Dashboard">
       </ui-title-bar>
       <BlockStack gap="500">
         <Layout>
           <Layout.Section>
             <Card>
-              <BlockStack gap="500">
-                <BlockStack gap="200">
-                  <Text as="h2" variant="headingMd">
-                    Congrats on creating a new Shopify app 🎉
-                  </Text>
-                  <Text variant="bodyMd" as="p">
-                    This embedded app template uses{" "}
-                    <Link
-                      url="https://shopify.dev/docs/apps/tools/app-bridge"
-                      target="_blank"
-                      removeUnderline
-                    >
-                      App Bridge
-                    </Link>{" "}
-                    interface examples like an{" "}
-                    <Link url="/app/additional" removeUnderline>
-                      additional page in the app nav
-                    </Link>
-                    , as well as an{" "}
-                    <Link
-                      url="https://shopify.dev/docs/api/admin-graphql"
-                      target="_blank"
-                      removeUnderline
-                    >
-                      Admin GraphQL
-                    </Link>{" "}
-                    mutation demo, to provide a starting point for app
-                    development.
-                  </Text>
-                </BlockStack>
-                <BlockStack gap="200">
-                  <Text as="h3" variant="headingMd">
-                    Get started with products
-                  </Text>
-                  <Text as="p" variant="bodyMd">
-                    Generate a product with GraphQL and get the JSON output for
-                    that product. Learn more about the{" "}
-                    <Link
-                      url="https://shopify.dev/docs/api/admin-graphql/latest/mutations/productCreate"
-                      target="_blank"
-                      removeUnderline
-                    >
-                      productCreate
-                    </Link>{" "}
-                    mutation in our API references.
-                  </Text>
-                </BlockStack>
-                <InlineStack gap="300">
-                  <Button loading={isLoading} onClick={generateProduct}>
-                    Generate a product
-                  </Button>
-                  {actionData?.product && (
-                    <Button
-                      url={`shopify:admin/products/${productId}`}
-                      target="_blank"
-                      variant="plain"
-                    >
-                      View product
-                    </Button>
-                  )}
-                </InlineStack>
-                {actionData?.product && (
-                  <Box
-                    padding="400"
-                    background="bg-surface-active"
-                    borderWidth="025"
-                    borderRadius="200"
-                    borderColor="border"
-                    overflowX="scroll"
-                  >
-                    <pre style={{ margin: 0 }}>
-                      <code>{JSON.stringify(actionData.product, null, 2)}</code>
-                    </pre>
-                  </Box>
-                )}
-              </BlockStack>
+              {wishlistData.length > 0 ? (
+                <IndexTable
+                  resourceName={resourceName}
+                  itemCount={wishlistData.length}
+                  headings={[
+                    { title: 'Customer ID' },
+                    { title: 'Product ID' },
+                    { title: 'Created At' }
+                  ]}
+                >
+                  {rowMarkup}
+                </IndexTable>
+              ) : (
+                <EmptyState
+                  heading="Manage your wishlist products here"
+                  action={{
+                    content: 'Learn more',
+                    url: '',
+                    external: true,
+                  }}
+                  secondaryAction={{
+                    content: 'Watch videos',
+                    url: '',
+                    external: true,
+                  }}
+                  image="https://cdn.shopify.com/s/files/1/0262/4071/2726/files/emptystate-files.png"
+                >
+                  <p>
+                    You don't have any products in your wishlist yet.
+                  </p>
+                </EmptyState>)}
             </Card>
           </Layout.Section>
           <Layout.Section variant="oneThird">
