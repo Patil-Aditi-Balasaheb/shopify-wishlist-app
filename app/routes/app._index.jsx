@@ -1,6 +1,4 @@
-import { useEffect } from "react";
 import { json } from "@remix-run/node";
-import { useActionData, useNavigation, useSubmit } from "@remix-run/react";
 import {
   Page,
   Layout,
@@ -11,15 +9,18 @@ import {
   Link,
   InlineStack,
   EmptyState,
-  IndexTable,
+  DataTable,
 } from "@shopify/polaris";
 import { authenticate } from "../shopify.server";
 import db from "../db.server"
 import { useLoaderData } from "@remix-run/react";
+import { formatDistanceToNow, parseISO } from "date-fns";
 
 export const loader = async ({ request }) => {
   const auth = await authenticate.admin(request);
   const shop = auth.session.shop;
+
+  // get data from db for a shop in asc order of id
   const wishlistData = await db.wishlist.findMany({
     where: {
       shop: shop,
@@ -39,22 +40,10 @@ export const action = async ({ request }) => {
 export default function Index() {
   const wishlistData = useLoaderData()
 
-  const rowMarkup = wishlistData.map(({ id, customerId, productId, createdAt }, index) => (
-    <IndexTable.Row id={id} key={id} position={index}>
-      <IndexTable.Cell>
-        <Text variant="bodyMd" fontWeight="bold" as="span">
-          {customerId}
-        </Text>
-      </IndexTable.Cell>
-      <IndexTable.Cell>{productId}</IndexTable.Cell>
-      <IndexTable.Cell>{new Date(createdAt).toLocaleDateString()}</IndexTable.Cell>
-    </IndexTable.Row>
-  ))
-
-  const resourceName = {
-    singular: 'wishlist',
-    plural: 'wishlists'
-  }
+  const wishlistArray = wishlistData.map((item) => {
+    const createdAt = formatDistanceToNow(parseISO(item.createdAt), { addSuffix: true })
+    return [item.customerId, item.productId, createdAt]
+  })
 
   return (
     <Page>
@@ -65,17 +54,20 @@ export default function Index() {
           <Layout.Section>
             <Card>
               {wishlistData.length > 0 ? (
-                <IndexTable
-                  resourceName={resourceName}
+                <DataTable
                   itemCount={wishlistData.length}
-                  headings={[
-                    { title: 'Customer ID' },
-                    { title: 'Product ID' },
-                    { title: 'Created At' }
+                  columnContentTypes={[
+                    'text',
+                    'text',
+                    'text',
                   ]}
-                >
-                  {rowMarkup}
-                </IndexTable>
+                  headings={[
+                    'Customer ID',
+                    'Product ID',
+                    'Created At'
+                  ]}
+                  rows={wishlistArray}
+                />
               ) : (
                 <EmptyState
                   heading="Manage your wishlist products here"
