@@ -1,5 +1,6 @@
 import { redirect } from "@remix-run/node";
-import { authenticate, MONTHLY_PLAN } from "../shopify.server";
+import { authenticate } from "../shopify.server";
+import { MONTHLY_PLAN } from "../customValue";
 
 export const loader = async ({ request }) => {
     const { billing } = await authenticate.admin(request);

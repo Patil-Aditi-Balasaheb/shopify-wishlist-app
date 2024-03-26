@@ -1,4 +1,5 @@
-import { authenticate, MONTHLY_PLAN, } from "../shopify.server";
+import { MONTHLY_PLAN } from "../customValue";
+import { authenticate } from "../shopify.server";
 
 export const loader = async ({ request }) => {
     const { billing, session } = await authenticate.admin(request);
@@ -10,7 +11,7 @@ export const loader = async ({ request }) => {
         onFailure: async () => billing.request({
             plan: MONTHLY_PLAN,
             isTest: true,
-            returnUrl: `https://admin.shopify.com/store/${myShop}/apps/wishlist-test-app-5/app/pricing`,
+            returnUrl: `https://admin.shopify.com/store/${myShop}/apps/wishlist-test-app-4/app/pricing`,
         }),
     });
 };

@@ -3,7 +3,7 @@
 client_id = "e9ff027fc3cb8d600204ed5b50434880"
 name = "wishlist-test-app"
 handle = "wishlist-test-app-4"
-application_url = "https://dialog-roommates-script-rated.trycloudflare.com"
+application_url = "https://closed-fax-deliver-pants.trycloudflare.com"
 embedded = true
 
 [build]
@@ -17,9 +17,9 @@ scopes = "write_products"
 
 [auth]
 redirect_urls = [
-  "https://dialog-roommates-script-rated.trycloudflare.com/auth/callback",
-  "https://dialog-roommates-script-rated.trycloudflare.com/auth/shopify/callback",
-  "https://dialog-roommates-script-rated.trycloudflare.com/api/auth/callback"
+  "https://closed-fax-deliver-pants.trycloudflare.com/auth/callback",
+  "https://closed-fax-deliver-pants.trycloudflare.com/auth/shopify/callback",
+  "https://closed-fax-deliver-pants.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]

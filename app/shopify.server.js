@@ -9,9 +9,7 @@ import { PrismaSessionStorage } from "@shopify/shopify-app-session-storage-prism
 import { restResources } from "@shopify/shopify-api/rest/admin/2024-01";
 import prisma from "./db.server";
 import { BillingInterval } from "@shopify/shopify-api";
-
-export const MONTHLY_PLAN = 'Monthly subscription';
-export const ANNUAL_PLAN = 'Annual subscription';
+import { ANNUAL_PLAN, MONTHLY_PLAN } from "./customValue";
 
 const shopify = shopifyApp({
   apiKey: process.env.SHOPIFY_API_KEY,

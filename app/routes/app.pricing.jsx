@@ -11,10 +11,11 @@ import {
   Grid,
   ExceptionList,
 } from "@shopify/polaris";
-import { ANNUAL_PLAN, MONTHLY_PLAN, authenticate } from "../shopify.server";
-import { useLoaderData } from "@remix-run/react";
+import { authenticate } from "../shopify.server";
+import { useLoaderData, useNavigate } from "@remix-run/react";
 import { json } from "@remix-run/node";
-import { MobileAcceptMajor } from '@shopify/polaris-icons'
+import { MobileIcon } from '@shopify/polaris-icons'
+import { MONTHLY_PLAN } from "../customValue";
 
 export async function loader({ request }) {
   const { billing } = await authenticate.admin(request)
@@ -80,6 +81,7 @@ const planData = [
 
 export default function PricingPage() {
   const { plan } = useLoaderData()
+  const navigate = useNavigate()
   return (
     <Page>
       <ui-title-bar title="Pricing" />
@@ -129,7 +131,7 @@ export default function PricingPage() {
                           key={index}
                           items={[
                             {
-                              icon: MobileAcceptMajor,
+                              icon: MobileIcon,
                               description: feature,
                             },
                           ]}
@@ -139,7 +141,7 @@ export default function PricingPage() {
                     <div style={{ margin: "0.5rem 0" }}>
                       <Divider />
                     </div>
-                    <Button primary url={plan_item.url}>
+                    <Button primary onClick={() => { navigate(plan_item.url) }}>
                       {plan_item.action}
                     </Button>
                   </Box>
